@@ -97,28 +97,43 @@ class BillExtractor:
 
         # Patterns (tailored for MSEDCL)
         patterns = {
-            "consumer_number": r"(?:Consumer No|ग्राहक क्रमांक)\s*[:\-]?\s*(\d{12})",
-            "consumer_name": r"(?:SHRI|SMT|MR|MRS)\s+([A-Z\s]+?)(?=\s+NO|\s+NI|\s+SHIWAJI|\s+214|$)", # Heuristic for name
-            "billing_month": r"(?:MONTH OF|महिना)\s*[:\-]?\s*([A-Za-z\-]+\d{2,4}|[^\s]+-\d{4})",
-            "units_consumed": r"(?:एकूण वापर|Total Usage|Usage|Unit)\s*[:\-]?\s*(\d+)",
+            "consumer_number": r"(?:Consumer No|ग्राहक क्रमांक|Consumer Number)\s*[:\-]?\s*(\d{10,12})",
+            "billing_month": r"(?:MONTH OF|महिना|Billing Month)\s*[:\-]?\s*([^\s]+-\d{4}|[A-Za-z]+\s*-\s*\d{4})",
+            "units_consumed": r"(?:एकूण वापर|Total Usage|युनिट|Unit|वापर|Units Consumed)\s*[:\-]?\s*(\d+)",
             "fixed_charges": r"(?:Fixed Charges|स्थिर आकार)\s*[:\-]?\s*(\d+\.?\d*)",
-            "sanction_load": r"(?:मंजूर भार|Sanctioned Load|Connected Load)\s*[:\-]?\s*(\d+\.?\d*)\s*(?:KW|HP)?",
-            "connection_type": r"(?:Tariff|दर संकेत|Connection Type)\s*[:\-]?\s*([^\s,]+)",
-            "bill_amount": r"(?:देय रक्कम रु|Bill Amount|Total Payable)\s*[:\-]?\s*(\d+\.?\d*)"
+            "sanction_load": r"(?:मंजूर भार|Sanctioned Load|Connected Load|Load)\s*[:\-]?\s*(\d+\.?\d*)\s*(?:KW|HP)?",
+            "connection_type": r"(?:Tariff|दर संकेत|Connection Type|Type)\s*[:\-]?\s*([0-9A-Z/]+\s+Res\s+[0-9A-Za-z\-]+|[^\s]+)",
+            "bill_amount": r"(?:देय रक्कम रु|Bill Amount|Total Payable|देय रक्कम|Amount)\s*[:\-]?\s*(\d+,?\d*\.?\d*)"
         }
+
+        # Clean text for regex matching
+        clean_txt = self.clean_text(text)
 
         for key, pattern in patterns.items():
             match = re.search(pattern, text, re.IGNORECASE | re.UNICODE)
+            if not match:
+                # Try on cleaned text too
+                match = re.search(pattern, clean_txt, re.IGNORECASE | re.UNICODE)
+            
             if match:
                 data[key] = match.group(1).strip()
 
-        # Fallback for name if first pattern fails
+        # Robust name extraction
         if not data["consumer_name"]:
-            # Often the name is on the 2nd or 3rd line of the bill
+            # Heuristic: Name is usually near the top, often in ALL CAPS, appearing after consumer number
             lines = text.split('\n')
-            for line in lines[:10]:
-                if any(kw in line.upper() for kw in ["SHRI", "SMT", "MR", "MRS", "RANJANA", "MADHUSHAM"]):
-                    data["consumer_name"] = line.strip()
+            for i, line in enumerate(lines[:15]):
+                line = line.strip()
+                # Skip lines that are just numbers or known labels
+                if any(kw in line.upper() for kw in ["SHRI", "SMT", "RANJANA", "MADHUSHAM", "KHOBRAGADE"]):
+                    data["consumer_name"] = line
                     break
+                # If we found consumer number, name is often 1-2 lines below
+                if data["consumer_number"] and data["consumer_number"] in line:
+                    if i + 1 < len(lines):
+                        next_line = lines[i+1].strip()
+                        if next_line and not next_line.isdigit():
+                            data["consumer_name"] = next_line
+                            break
 
         return data

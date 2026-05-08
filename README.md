@@ -7,8 +7,9 @@ Solar Load Calculator is an AI-powered automation system designed for **Energyba
 - **Hybrid OCR Pipeline**: Combines direct PDF text extraction with Tesseract OCR for scanned images/PDFs.
 - **Automated Data Extraction**: Extracts Consumer Name, Number, Billing Month, Units, Sanction Load, Tariff, and Bill Amount using robust Regex patterns.
 - **Excel Automation**: Populates an existing Excel template while preserving formulas and formatting.
-- **Streamlit UI**: Simple, user-friendly interface for uploading bills, verifying extracted data, and downloading results.
-- **Error Handling**: Gracefully handles corrupted files, OCR failures, and missing fields.
+- **Streamlit UI**: Simple, user-friendly interface for uploading bills, verifying extracted data, and downloading results. Includes a clean design with "Advanced Settings" tucked away.
+- **Local Testing Suite**: Includes a dedicated test script to verify extraction locally before deploying.
+- **Robust Excel Formatting**: Ensures consumer numbers are stored as text (avoiding scientific notation) and handles unit conversion safely.
 
 ## Tech Stack
 - **Language**: Python 3.11+
@@ -60,9 +61,22 @@ solar_load_calculator/
    - Create a `.env` file or use the provided one.
    - If Tesseract is not in your system PATH, specify it in the sidebar of the app or in `.env`.
 
+## Streamlit Cloud Deployment
+This project is configured for easy deployment on Streamlit Cloud:
+- **requirements.txt**: Uses `opencv-python-headless` to avoid missing library errors.
+- **packages.txt**: Automatically installs Tesseract OCR and required system libraries.
+- **Imports**: `main.py` includes a path fix for consistent module discovery on cloud environments.
+
 ## How to Use
 
-1. **Run the Application**:
+### Local Testing (CLI)
+Before running the UI, you can verify the extraction logic on sample bills:
+```bash
+python scratch/test_extraction.py
+```
+
+### Running the Application
+1. **Start the app**:
    ```bash
    streamlit run app/main.py
    ```

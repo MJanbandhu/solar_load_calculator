@@ -1,11 +1,16 @@
 import streamlit as st
 import os
+import sys
 import pandas as pd
+import tempfile
+from PIL import Image
+
+# Fix for Streamlit Cloud imports
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from extractor import BillExtractor
 from excel_writer import ExcelWriter
 from utils import logger, ensure_directories, get_timestamp
-import tempfile
-from PIL import Image
 
 # Page configuration
 st.set_page_config(
@@ -29,10 +34,14 @@ def main():
     *Built for Energybae AI Internship Assignment.*
     """)
     
-    st.sidebar.header("Settings")
-    tesseract_path = st.sidebar.text_input("Tesseract Path (if needed)", value="")
-    template_path = st.sidebar.text_input("Template Path", value="data/templates/template.xlsx")
-    solar_watt = st.sidebar.number_input("Solar Panel Watt (C7)", value=3000, step=100)
+    # Move settings to expander for cleaner UI
+    with st.expander("⚙️ Advanced Settings"):
+        tesseract_path = st.text_input("Tesseract Path (Leave blank for default)", value="")
+        template_path = st.text_input("Template Path", value="data/templates/template.xlsx")
+        solar_watt = st.number_input("Solar Panel Watt (C7)", value=3000, step=100)
+        
+        if st.session_state.extracted_data and 'raw_text' in st.session_state:
+            st.text_area("Raw Extracted Text (Debug)", value=st.session_state.raw_text, height=200)
 
     # File uploader
     uploaded_file = st.file_uploader("Upload Electricity Bill (PDF, JPG, PNG)", type=["pdf", "jpg", "jpeg", "png"])
@@ -63,6 +72,7 @@ def main():
                     
                     data = extractor.extract_bill_data(text)
                     st.session_state.extracted_data = data
+                    st.session_state.raw_text = text # Store for debug
                     st.success("Data extraction complete!")
                 except Exception as e:
                     st.error(f"Error during extraction: {e}")
