@@ -28,9 +28,11 @@ Streamlit App: https://solar-load-calculator-automation.streamlit.app/
 
 ## Workflow Architecture
 
- SysArchitecture/SystemWorkflowArchitecture.png
+<p align="center">
+  <img src="SystemImages/SystemWorkflowArchitecture.png" width="850">
+</p>
 
-
+The system processes electricity bills through a hybrid extraction pipeline combining direct PDF parsing and OCR fallback, followed by regex-based field extraction, manual verification, and automated Excel template population.
 ## Folder Structure
 ```text
 solar_load_calculator/
@@ -46,6 +48,9 @@ solar_load_calculator/
 │   ├── outputs/         # Generated Excel files with timestamps
 │   ├── templates/       # Excel template storage
 │
+├── SystemImages/
+│   └── SystemWorkflowArchitecture.png
+|
 ├── .env                 # Configuration variables
 ├── requirements.txt     # Python dependencies
 └── README.md            # Project documentation
@@ -111,6 +116,12 @@ python scratch/test_extraction.py
 4. **Verify & Edit**: Check the extracted fields. If OCR missed anything, you can manually correct it in the form.
 5. **Generate Excel**: Click "Generate Excel File".
 6. **Download**: Click the download button to get your filled Excel report.
+
+## Screenshots
+
+### Upload Interface
+
+![Upload Interface](SystemImages/Screenshot%202026-05-11%20at%2000-13-15%20Solar%20Load%20Calculator%20Automation%20%C2%B7%20Streamlit.png)
 
 ## Technical Challenges Solved
 
