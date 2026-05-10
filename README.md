@@ -3,6 +3,13 @@
 ## Overview
 Solar Load Calculator is an AI-powered automation system designed for **Energybae** to streamline the solar system sizing process. It automatically extracts key data from electricity bills (PDF/Images) and populates a specialized Excel template, saving time and reducing manual errors.
 
+## Live Demo
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://solar-load-calculator-automation.streamlit.app/)
+
+### OR
+
+Streamlit App: https://solar-load-calculator-automation.streamlit.app/
+
 ## Features
 - **Hybrid OCR Pipeline**: Combines direct PDF text extraction with Tesseract OCR for scanned images/PDFs.
 - **Automated Data Extraction**: Extracts Consumer Name, Number, Billing Month, Units, Sanction Load, Tariff, and Bill Amount using robust Regex patterns.
@@ -18,6 +25,11 @@ Solar Load Calculator is an AI-powered automation system designed for **Energyba
 - **PDF Processing**: pdfplumber, PyMuPDF (fitz)
 - **Excel Automation**: openpyxl
 - **Data Handling**: pandas, numpy
+
+## Workflow Architecture
+
+ SysArchitecture/SystemWorkflowArchitecture.png
+
 
 ## Folder Structure
 ```text
@@ -61,6 +73,20 @@ solar_load_calculator/
    - Create a `.env` file or use the provided one.
    - If Tesseract is not in your system PATH, specify it in the sidebar of the app or in `.env`.
 
+## Deployment Notes
+
+The application is deployed on Streamlit Cloud.
+
+For OCR support:
+- Tesseract OCR is installed using `packages.txt`
+- `opencv-python-headless` is used for cloud compatibility
+- Local execution may provide better OCR performance for large scanned PDFs
+
+## Live Demo
+
+Streamlit App: https://solar-load-calculator-automation.streamlit.app/
+
+
 ## Streamlit Cloud Deployment
 This project is configured for easy deployment on Streamlit Cloud:
 - **requirements.txt**: Uses `opencv-python-headless` to avoid missing library errors.
@@ -86,6 +112,15 @@ python scratch/test_extraction.py
 5. **Generate Excel**: Click "Generate Excel File".
 6. **Download**: Click the download button to get your filled Excel report.
 
+## Technical Challenges Solved
+
+- Handling both text-based and scanned PDFs
+- OCR preprocessing for noisy electricity bills
+- Preserving Excel formulas during automation
+- Avoiding scientific notation in consumer numbers
+- Mapping extracted months dynamically into Excel rows
+- Supporting editable correction before final export
+
 ## Future Improvements
 - **LLM Integration**: Use LLMs (like GPT-4o or Gemini Flash) for even more accurate extraction from complex layouts.
 - **Batch Processing**: Allow uploading multiple bills at once.
@@ -94,3 +129,7 @@ python scratch/test_extraction.py
 
 ## License
 Built for Energybae Internship Assignment.
+
+## Author
+Mohit Janbandhu
+
